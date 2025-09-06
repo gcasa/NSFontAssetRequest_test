@@ -16,6 +16,22 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // Insert code here to initialize your application
+    NSFontDescriptor *descriptor = [NSFontDescriptor fontDescriptorWithName: @"Helvetica" size: 12.0];
+    NSArray *fontDescriptors = [NSArray arrayWithObject: descriptor];
+    NSFontAssetRequest *request = [[NSFontAssetRequest alloc]
+                                   initWithFontDescriptors: fontDescriptors
+                                   options: NSFontAssetRequestOptionUsesStandardUI];
+    
+    [request downloadFontAssetsWithCompletionHandler:^BOOL(NSError * _Nullable error) {
+        if (error != NULL)
+        {
+            NSLog(@"Downloaded with completion code %@", error);
+            return NO;
+        }
+        return YES;
+    }];
+    // NSArray *downloaded = [request downloadedFontDescriptors];
+    // NSLog(@"downloaded = %@", downloaded);
 }
 
 
