@@ -10,27 +10,15 @@
 @interface AppDelegate ()
 
 @property (strong) IBOutlet NSWindow *window;
+@property (strong) IBOutlet NSTextField *fontNameField;
+@property (strong) IBOutlet NSButton *button;
+
 @end
 
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    // Insert code here to initialize your application
-    NSFontDescriptor *descriptor = [NSFontDescriptor fontDescriptorWithName: @"Helvetica" size: 12.0];
-    NSArray *fontDescriptors = [NSArray arrayWithObject: descriptor];
-    NSFontAssetRequest *request = [[NSFontAssetRequest alloc]
-                                   initWithFontDescriptors: fontDescriptors
-                                   options: NSFontAssetRequestOptionUsesStandardUI];
-    
-    [request downloadFontAssetsWithCompletionHandler:^BOOL(NSError * _Nullable error) {
-        if (error != NULL)
-        {
-            NSLog(@"Downloaded with completion code %@", error);
-            return NO;
-        }
-        return YES;
-    }];
-    // NSArray *downloaded = [request downloadedFontDescriptors];
+        // NSArray *downloaded = [request downloadedFontDescriptors];
     // NSLog(@"downloaded = %@", downloaded);
 }
 
@@ -44,5 +32,22 @@
     return YES;
 }
 
-
+- (IBAction) downloadFont: (id)sender
+{
+    // Insert code here to initialize your application
+    NSFontDescriptor *descriptor = [NSFontDescriptor fontDescriptorWithName: [self.fontNameField stringValue] size: 12.0];
+    NSArray *fontDescriptors = [NSArray arrayWithObject: descriptor];
+    NSFontAssetRequest *request = [[NSFontAssetRequest alloc]
+                                   initWithFontDescriptors: fontDescriptors
+                                   options: NSFontAssetRequestOptionUsesStandardUI];
+    
+    [request downloadFontAssetsWithCompletionHandler:^BOOL(NSError * _Nullable error) {
+        if (error != NULL)
+        {
+            NSLog(@"Downloaded with completion code %@", error);
+            return NO;
+        }
+        return YES;
+    }];
+}
 @end
