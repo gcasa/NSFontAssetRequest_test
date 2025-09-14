@@ -7,26 +7,16 @@
 
 #import "AppDelegate.h"
 
-@interface AppDelegate ()
-
-@property (strong) IBOutlet NSWindow *window;
-@property (strong) IBOutlet NSTextField *fontNameField;
-@property (strong) IBOutlet NSButton *button;
-
-@end
-
 @implementation AppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-        // NSArray *downloaded = [request downloadedFontDescriptors];
-    // NSLog(@"downloaded = %@", downloaded);
+    // code after the app finishes launching...
 }
 
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
     // Insert code here to tear down your application
 }
-
 
 - (BOOL)applicationSupportsSecureRestorableState:(NSApplication *)app {
     return YES;
@@ -35,7 +25,7 @@
 - (IBAction) downloadFont: (id)sender
 {
     // Insert code here to initialize your application
-    NSFontDescriptor *descriptor = [NSFontDescriptor fontDescriptorWithName: [self.fontNameField stringValue] size: 12.0];
+    NSFontDescriptor *descriptor = [NSFontDescriptor fontDescriptorWithName: [fontNameField stringValue] size: 12.0];
     NSArray *fontDescriptors = [NSArray arrayWithObject: descriptor];
     NSFontAssetRequest *request = [[NSFontAssetRequest alloc]
                                    initWithFontDescriptors: fontDescriptors
@@ -50,4 +40,62 @@
         return YES;
     }];
 }
+
+- (void)awakeFromNib
+{
+    // Initialize the fonts controller
+    fontsController = [[GoogleFontsController alloc] init];
+    
+    // Set up the table view
+    [self setupTableView];
+    
+    // Connect the controller to the table view
+    // This would typically be done in Interface Builder,
+    // but here's how to do it programmatically:
+    [tableView setDataSource: fontsController];
+    [tableView setDelegate: fontsController];
+}
+
+- (void)setupTableView
+{
+    // Create table columns programmatically
+    // (In Interface Builder, you'd set these up visually)
+    
+    NSTableColumn *familyColumn = [[NSTableColumn alloc] initWithIdentifier:@"family"];
+    [[familyColumn headerCell] setStringValue:@"Font Family"];
+    [familyColumn setWidth:200];
+    [tableView addTableColumn:familyColumn];
+    
+    NSTableColumn *categoryColumn = [[NSTableColumn alloc] initWithIdentifier:@"category"];
+    [[categoryColumn headerCell] setStringValue:@"Category"];
+    [categoryColumn setWidth:100];
+    [tableView addTableColumn:categoryColumn];
+    
+    NSTableColumn *variantsColumn = [[NSTableColumn alloc] initWithIdentifier:@"variants"];
+    [[variantsColumn headerCell] setStringValue:@"Variants"];
+    [variantsColumn setWidth:150];
+    [tableView addTableColumn:variantsColumn];
+    
+    NSTableColumn *subsetsColumn = [[NSTableColumn alloc] initWithIdentifier:@"subsets"];
+    [[subsetsColumn headerCell] setStringValue:@"Subsets"];
+    [subsetsColumn setWidth:200];
+    [tableView addTableColumn:subsetsColumn];
+    
+    [fontsController setTableView: tableView];
+}
+
+- (IBAction) loadFonts: (id)sender
+{
+    // Load fonts using the Google Fonts API
+    // Note: You'll need an API key for the official endpoint
+    // NSString *apiKey = @"YOUR_API_KEY_HERE";
+    // NSString *urlString = [NSString stringWithFormat:@"https://www.googleapis.com/webfonts/v1/webfonts?key=%@", apiKey];
+    NSString *urlString = @"https://fonts.google.com/metadata/fonts";
+    
+    // For the metadata endpoint you mentioned (if it becomes accessible):
+    // NSString *urlString = @"https://fonts.google.com/metadata/fonts";
+    
+    [fontsController loadFontsFromURL:urlString];
+}
+
 @end
