@@ -24,7 +24,6 @@
 #ifdef GNUSTEP
     [fontsArray release];
     [receivedData release];
-    [connection release];
     [super dealloc];
 #endif
 }
@@ -71,20 +70,33 @@
                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
                                          timeoutInterval:30.0];
 
-#ifdef GNUSTEP
-    // Start the connection
-    if (connection) {
-        [connection release];
-    }
-#endif
-    connection = [[NSURLConnection alloc] initWithRequest: request delegate: self];
+    NSLog(@"Loading fonts from: %@", urlString);
 
-    if (!connection) {
-        NSLog(@"Failed to create URL connection");
-    } else {
-        NSLog(@"Loading fonts from: %@", urlString);
-	[connection start];
-    }
+    // Create and start the data task
+    NSURLSession *session = [NSURLSession sharedSession];
+    NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request
+                                                completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error) {
+            NSLog(@"Connection failed with error: %@", [error localizedDescription]);
+            return;
+        }
+
+        if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            NSLog(@"HTTP Response: %ld", (long)[httpResponse statusCode]);
+        }
+
+        if (data) {
+            NSLog(@"Connection finished loading. Received %lu bytes", (unsigned long)[data length]);
+
+            // Parse the data on the main queue to update the UI
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self parseFontsData:data];
+            });
+        }
+    }];
+
+    [dataTask resume];
 }
 
 - (void)parseFontsData:(NSData *)data
@@ -105,30 +117,30 @@
     if ([jsonObject isKindOfClass:[NSDictionary class]])
       {
         NSDictionary *jsonDict = (NSDictionary *)jsonObject;
-        NSArray *items = [jsonDict objectForKey:@"items"];
-	
+        NSArray *items = [jsonDict objectForKey:@"familyMetadataList"];
+
         if ([items isKindOfClass:[NSArray class]])
 	  {
             NSEnumerator *enumerator = [items objectEnumerator];
             NSDictionary *fontInfo;
-	    
+
             while ((fontInfo = [enumerator nextObject]))
 	      {
 		if ([fontInfo isKindOfClass:[NSDictionary class]])
 		  {
 		    // Create a simplified font dictionary with the information we need
 		    NSMutableDictionary *font = [NSMutableDictionary dictionary];
-		    
+
 		    NSString *family = [fontInfo objectForKey:@"family"];
 		    NSString *category = [fontInfo objectForKey:@"category"];
                     NSArray *variants = [fontInfo objectForKey:@"variants"];
                     NSArray *subsets = [fontInfo objectForKey:@"subsets"];
-		    
+
                     if (family) [font setObject:family forKey:@"family"];
                     if (category) [font setObject:category forKey:@"category"];
                     if (variants) [font setObject:variants forKey:@"variants"];
                     if (subsets) [font setObject:subsets forKey:@"subsets"];
-		    
+
                     [fontsArray addObject:font];
 		  }
 	      }
@@ -142,40 +154,6 @@
       {
         [fontsTableView reloadData];
       }
-}
-
-#pragma mark - NSURLConnection Delegate Methods
-
-- (void)connection:(NSURLConnection *)conn didReceiveResponse:(NSURLResponse *)response
-{
-    [receivedData setLength:0];
-
-    if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
-        NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-        NSLog(@"HTTP Response: %d", [httpResponse statusCode]);
-    }
-}
-
-- (void)connection:(NSURLConnection *)conn didReceiveData:(NSData *)data
-{
-    [receivedData appendData:data];
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)conn
-{
-    NSLog(@"Connection finished loading. Received %d bytes", [receivedData length]);
-    [self parseFontsData:receivedData];
-#ifdef GNUSTEP
-    DESTROY(connection);
-#endif
-}
-
-- (void)connection:(NSURLConnection *)conn didFailWithError:(NSError *)error
-{
-    NSLog(@"Connection failed with error: %@", [error localizedDescription]);
-#ifdef GNUSTEP
-    DESTROY(connection);
-#endif
 }
 
 #pragma mark - NSTableViewDataSource Methods
