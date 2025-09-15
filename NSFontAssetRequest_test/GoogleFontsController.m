@@ -205,6 +205,8 @@
         // - Updating a preview
         // - Loading font files
         // - Displaying detailed information
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"GSSelectedFontNotification" object: selectedFont];
     }
 }
 

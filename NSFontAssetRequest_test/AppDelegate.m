@@ -11,6 +11,7 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // code after the app finishes launching...
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(handleNotification:)  name: @"GSSelectedFontNotification" object: nil];
 }
 
 
@@ -20,6 +21,13 @@
 
 - (BOOL)applicationSupportsSecureRestorableState:(NSApplication *)app {
     return YES;
+}
+
+- (void) handleNotification: (NSNotification *)notif
+{
+    NSDictionary *obj = [notif object];
+    NSLog(@"object = %@", obj);
+    [fontNameField setStringValue: [obj objectForKey: @"family"]];
 }
 
 - (IBAction) downloadFont: (id)sender
