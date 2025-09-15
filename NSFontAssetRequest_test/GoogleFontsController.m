@@ -12,10 +12,11 @@
 - (id)init
 {
     self = [super init];
-    if (self) {
+    if (self)
+      {
         fontsArray = [[NSMutableArray alloc] init];
         receivedData = [[NSMutableData alloc] init];
-    }
+      }
     return self;
 }
 
@@ -46,14 +47,15 @@
 
 - (void)setFontsArray:(NSMutableArray *)array
 {
-    if (fontsArray != array) {
+    if (fontsArray != array)
+      {
 #ifdef GNUSTEP
         [fontsArray release];
         fontsArray = [array retain];
 #else
         fontsArray = array;
 #endif
-    }
+      }
 }
 
 #pragma mark - Font Loading Methods
@@ -66,9 +68,9 @@
 
     // Create the request
     NSURL *url = [NSURL URLWithString:urlString];
-    NSURLRequest *request = [NSURLRequest requestWithURL:url
-                                             cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                         timeoutInterval:30.0];
+    NSURLRequest *request = [NSURLRequest requestWithURL: url
+                                             cachePolicy: NSURLRequestUseProtocolCachePolicy
+                                         timeoutInterval: 30.0];
 
     NSLog(@"Loading fonts from: %@", urlString);
 
@@ -76,24 +78,27 @@
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request
                                                 completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if (error) {
+        if (error)
+	  {
             NSLog(@"Connection failed with error: %@", [error localizedDescription]);
             return;
-        }
-
-        if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+	  }
+	
+        if ([response isKindOfClass:[NSHTTPURLResponse class]])
+	  {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
             NSLog(@"HTTP Response: %ld", (long)[httpResponse statusCode]);
-        }
+	  }
 
-        if (data) {
+        if (data)
+	  {
             NSLog(@"Connection finished loading. Received %lu bytes", (unsigned long)[data length]);
-
+	    
             // Parse the data directly
             [self parseFontsData:data];
-        }
-    }];
-
+	  }
+      }];
+    
     [dataTask resume];
 }
 
@@ -163,30 +168,40 @@
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
 {
-    if (row < 0 || row >= [fontsArray count]) {
+    if (row < 0 || row >= [fontsArray count])
+      {
         return nil;
-    }
+      }
 
     NSDictionary *font = [fontsArray objectAtIndex:row];
     NSString *identifier = [tableColumn identifier];
 
-    if ([identifier isEqualToString:@"family"]) {
+    if ([identifier isEqualToString:@"family"])
+      {
         return [font objectForKey:@"family"];
-    } else if ([identifier isEqualToString:@"category"]) {
+      }
+    else if ([identifier isEqualToString:@"category"])
+      {
         return [font objectForKey:@"category"];
-    } else if ([identifier isEqualToString:@"variants"]) {
+      }
+    else if ([identifier isEqualToString:@"variants"])
+      {
         NSArray *variants = [font objectForKey:@"variants"];
-        if (variants) {
+        if (variants)
+	  {
             return [variants componentsJoinedByString:@", "];
-        }
+	  }
         return @"";
-    } else if ([identifier isEqualToString:@"subsets"]) {
-        NSArray *subsets = [font objectForKey:@"subsets"];
-        if (subsets) {
-            return [subsets componentsJoinedByString:@", "];
-        }
-        return @"";
-    }
+      }
+    else if ([identifier isEqualToString:@"subsets"])
+      {
+	NSArray *subsets = [font objectForKey:@"subsets"];
+	if (subsets)
+	  {
+	    return [subsets componentsJoinedByString:@", "];
+	  }
+	return @"";
+      }
 
     return @"";
 }

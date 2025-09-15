@@ -41,12 +41,12 @@
     
     [request downloadFontAssetsWithCompletionHandler:^BOOL(NSError * _Nullable error) {
         if (error != NULL)
-        {
+	  {
             NSLog(@"Downloaded with completion code %@", error);
             return NO;
-        }
+	  }
         return YES;
-    }];
+      }];
 }
 
 - (void)awakeFromNib
