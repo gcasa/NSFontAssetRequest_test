@@ -83,79 +83,65 @@
         NSLog(@"Failed to create URL connection");
     } else {
         NSLog(@"Loading fonts from: %@", urlString);
+	[connection start];
     }
 }
 
 - (void)parseFontsData:(NSData *)data
 {
     NSError *error = nil;
-
-    // For older GNUstep versions that might not have NSJSONSerialization,
-    // we'll try to parse manually or use NSPropertyListSerialization as fallback
     id jsonObject = nil;
 
-    // Try NSJSONSerialization first (available in newer GNUstep)
-    @try {
-        Class jsonClass = NSClassFromString(@"NSJSONSerialization");
-        if (jsonClass) {
-            jsonObject = [jsonClass JSONObjectWithData:data
-                                              options:0
-                                                error:&error];
-        }
-    }
-    @catch (NSException *exception) {
-        NSLog(@"NSJSONSerialization not available: %@", exception.reason);
-    }
-
-    if (!jsonObject) {
-        // Fallback: try to parse as property list (less likely to work with JSON)
-        jsonObject = [NSPropertyListSerialization propertyListFromData: data
-                                                      mutabilityOption: NSPropertyListImmutable
-                                                                format: NULL
-                                                      errorDescription: NULL];
-    }
-
-    if (!jsonObject) {
-        NSLog(@"Failed to parse JSON data");
+    jsonObject = [NSJSONSerialization  JSONObjectWithData: data
+						  options: 0
+						    error: &error];
+    if (!jsonObject)
+      {
+	NSLog(@"Failed to parse JSON data");
         return;
-    }
+      }
 
     // Extract fonts from the parsed data
-    if ([jsonObject isKindOfClass:[NSDictionary class]]) {
+    if ([jsonObject isKindOfClass:[NSDictionary class]])
+      {
         NSDictionary *jsonDict = (NSDictionary *)jsonObject;
         NSArray *items = [jsonDict objectForKey:@"items"];
-
-        if ([items isKindOfClass:[NSArray class]]) {
+	
+        if ([items isKindOfClass:[NSArray class]])
+	  {
             NSEnumerator *enumerator = [items objectEnumerator];
             NSDictionary *fontInfo;
-
-            while ((fontInfo = [enumerator nextObject])) {
-                if ([fontInfo isKindOfClass:[NSDictionary class]]) {
-                    // Create a simplified font dictionary with the information we need
-                    NSMutableDictionary *font = [NSMutableDictionary dictionary];
-
-                    NSString *family = [fontInfo objectForKey:@"family"];
-                    NSString *category = [fontInfo objectForKey:@"category"];
+	    
+            while ((fontInfo = [enumerator nextObject]))
+	      {
+		if ([fontInfo isKindOfClass:[NSDictionary class]])
+		  {
+		    // Create a simplified font dictionary with the information we need
+		    NSMutableDictionary *font = [NSMutableDictionary dictionary];
+		    
+		    NSString *family = [fontInfo objectForKey:@"family"];
+		    NSString *category = [fontInfo objectForKey:@"category"];
                     NSArray *variants = [fontInfo objectForKey:@"variants"];
                     NSArray *subsets = [fontInfo objectForKey:@"subsets"];
-
+		    
                     if (family) [font setObject:family forKey:@"family"];
                     if (category) [font setObject:category forKey:@"category"];
                     if (variants) [font setObject:variants forKey:@"variants"];
                     if (subsets) [font setObject:subsets forKey:@"subsets"];
-
+		    
                     [fontsArray addObject:font];
-                }
-            }
-        }
-    }
+		  }
+	      }
+	  }
+      }
 
     NSLog(@"Loaded %d fonts", [fontsArray count]);
 
     // Reload the table view
-    if (fontsTableView) {
+    if (fontsTableView)
+      {
         [fontsTableView reloadData];
-    }
+      }
 }
 
 #pragma mark - NSURLConnection Delegate Methods
