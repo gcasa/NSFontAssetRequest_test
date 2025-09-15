@@ -89,10 +89,8 @@
         if (data) {
             NSLog(@"Connection finished loading. Received %lu bytes", (unsigned long)[data length]);
 
-            // Parse the data on the main queue to update the UI
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self parseFontsData:data];
-            });
+            // Parse the data directly
+            [self parseFontsData:data];
         }
     }];
 
