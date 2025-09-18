@@ -37,6 +37,8 @@
     // Insert code here to initialize your application
     NSFontDescriptor *descriptor = [NSFontDescriptor fontDescriptorWithName: [fontNameField stringValue] size: 12.0];
     NSArray *fontDescriptors = [NSArray arrayWithObject: descriptor];
+    
+    // This part does NOT work on macOS as Apple has it's own font source... GNUstep uses google fonts.
     NSFontAssetRequest *request = [[NSFontAssetRequest alloc]
                                    initWithFontDescriptors: fontDescriptors
                                    options: NSFontAssetRequestOptionUsesStandardUI];
