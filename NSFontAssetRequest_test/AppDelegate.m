@@ -12,6 +12,8 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     // code after the app finishes launching...
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(handleNotification:)  name: @"GSSelectedFontNotification" object: nil];
+    
+    [self loadFonts: nil];
 }
 
 
@@ -52,7 +54,7 @@
 - (void)awakeFromNib
 {
     // Initialize the fonts controller
-    fontsController = [[GoogleFontsController alloc] init];
+    // fontsController = [[GoogleFontsController alloc] init];
     
     // Set up the table view
     [self setupTableView];

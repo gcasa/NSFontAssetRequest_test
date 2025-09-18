@@ -14,7 +14,7 @@
     IBOutlet NSTableView *tableView;
     IBOutlet NSTextField *fontNameField;
     IBOutlet NSButton *button;
-    GoogleFontsController *fontsController;
+    IBOutlet GoogleFontsController *fontsController;
 }
 
 - (IBAction)loadFonts:(id)sender;
