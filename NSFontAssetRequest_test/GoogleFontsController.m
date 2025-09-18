@@ -155,7 +155,9 @@
     // Reload the table view
     if (fontsTableView)
       {
-        [fontsTableView reloadData];
+        [fontsTableView performSelectorOnMainThread: @selector(reloadData)
+                                         withObject: nil
+                                      waitUntilDone: YES];
       }
 }
 
