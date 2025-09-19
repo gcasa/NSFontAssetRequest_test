@@ -39,6 +39,7 @@
   NSArray *fontDescriptors = [NSArray arrayWithObject: descriptor];
 
   // This part does NOT work on macOS as Apple has it's own font source... GNUstep uses google fonts.
+#ifndef GNUSTEP
   NSFontAssetRequest *request = [[NSFontAssetRequest alloc]
 				   initWithFontDescriptors: fontDescriptors
 						   options: NSFontAssetRequestOptionUsesStandardUI];
@@ -51,6 +52,10 @@
 	}
       return YES;
     }];
+#else
+    NSLog(@"Not installed, this is a test for GNUstep");
+#endif
+    
 }
 
 - (void)awakeFromNib
