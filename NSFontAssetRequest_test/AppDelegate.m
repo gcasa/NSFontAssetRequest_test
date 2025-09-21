@@ -9,19 +9,25 @@
 
 @implementation AppDelegate
 
-- (void)applicationDidFinishLaunching: (NSNotification *)aNotification {
+- (void)applicationDidFinishLaunching: (NSNotification *)aNotification
+{
     // code after the app finishes launching...
-    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(handleNotification:)  name: @"GSSelectedFontNotification" object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+					     selector: @selector(handleNotification:)
+						 name: @"GSSelectedFontNotification"
+					       object: nil];
 
     [self loadFonts: nil];
 }
 
 
-- (void)applicationWillTerminate: (NSNotification *)aNotification {
+- (void)applicationWillTerminate: (NSNotification *)aNotification
+{
   // Insert code here to tear down your application
 }
 
-- (BOOL)applicationSupportsSecureRestorableState: (NSApplication *)app {
+- (BOOL)applicationSupportsSecureRestorableState: (NSApplication *)app
+{
   return YES;
 }
 
@@ -34,7 +40,6 @@
 
 - (IBAction) downloadFont: (id)sender
 {
-  // Insert code here to initialize your application
   NSFontDescriptor *descriptor = [NSFontDescriptor fontDescriptorWithName: [fontNameField stringValue] size: 12.0];
   NSArray *fontDescriptors = [NSArray arrayWithObject: descriptor];
 
